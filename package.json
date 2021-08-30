@@ -4,7 +4,8 @@
   "description": "A Smart Discord Bot to handle your day to day needs with voice",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Hello World!\""
+    "test": "echo \"Hello World!\"",
+    "start" : "node main.js"
   },
   "author": "a17rohan@gmail.com",
   "license": "ISC",

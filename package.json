@@ -1,0 +1,11 @@
+{
+  "name": "raju-bot",
+  "version": "0.0.1",
+  "description": "A Smart Discord Bot to handle your day to day needs with voice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Hello World!\""
+  },
+  "author": "a17rohan@gmail.com",
+  "license": "ISC"
+}

@@ -1,17 +1,18 @@
 {
-  "name": "discordvoiceassistant",
-  "version": "1.0.0",
+  "name": "raju-discord-assistant",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "setup" : "sh scripts/setup.sh",
     "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/quentinmay/discord-voice-assistant.git"
   },
-  "author": "Quentin May",
+  "author": "Amit Rohan",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/quentinmay/discord-voice-assistant/issues"

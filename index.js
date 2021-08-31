@@ -189,12 +189,18 @@ client.on('message', (msg) => {
     if (msg.content.charAt(0) === config.commandPrefix
             || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase()) {
         textChannel = msg.channel;
-        var rawString = msg.content.slice(1);
-        var cmd = rawString.split(' ')[0].toLowerCase();
 
-        var tmp = rawString.split(" ");
-        tmp.shift();
-        var contents = tmp.join(" ");
+        var arrString = msg.content.split(' ')
+        //remove our commandPrefix using shift
+        arrString.shift()
+
+        var cmd = arrString[0];
+        //remove our command using shift
+        arrString.shift()
+        var contents = arrString.join(" ");
+        
+        
+        console.log("Cmd",cmd,contents);
 
         switch (cmd) {
             case 'test':

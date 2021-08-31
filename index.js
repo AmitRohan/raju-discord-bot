@@ -43,7 +43,7 @@ var voiceRecognitionTotalTime = 0;
 var voiceRecognitionInstances = 0;
 
 var repeat = false;
-var volume = 20;
+var volume = 100;
 
 var afkTimer = 0;
 
@@ -1104,12 +1104,14 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
     const streamOptions = {
         seek: 0
     }; //, volume: volume};
-    console.log(url);
+    console.log("Streaming",url);
+    textChannel.send("`Playing  "+ url +"`")
     musicStream = ytdl(url, {
         filter: 'audioonly'
     });
     var connection;
     if (client.voice.connections.size == 1) {
+        console.log("1",url);
         connection = client.voice.connections.first(1)[0];
         if (!connection) return;
         dispatcher = connection.play(musicStream, streamOptions);
@@ -1125,7 +1127,8 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
         });
         */
         dispatcher.on('speaking', (speaking) => { //when finished speaking, play next song because that means songs over
-
+            console.log("Audio Stopped");
+            textChannel
             if (pause == true) return;
             if (speaking == 1) return; //still speaking
             // console.log(speaking);
@@ -1139,6 +1142,8 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
         });
 
     } else if (voiceChannel) {
+        console.log("2",url);
+
         voiceChannel.join().then((connection) => {
             dispatcher = connection.play(musicStream, streamOptions);
             dispatcher.setVolumeLogarithmic(volume / 100);

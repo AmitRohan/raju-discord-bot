@@ -186,7 +186,8 @@ async function getGuildMemberFromServerIDAndUserID(serverID, id) {
 
 
 client.on('message', (msg) => {
-    if (msg.content.charAt(0) === config.commandPrefix) {
+    if (msg.content.charAt(0) === config.commandPrefix
+            || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase()) {
         textChannel = msg.channel;
         var rawString = msg.content.slice(1);
         var cmd = rawString.split(' ')[0].toLowerCase();

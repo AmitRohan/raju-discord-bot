@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "setup" : "sh scripts/setup.sh",
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "hot-reload": "nodemon index.js"
   },
   "repository": {
     "type": "git",

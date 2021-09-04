@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup" : "sh scripts/setup.sh",
+    "setup": "sh scripts/setup.sh",
     "start": "node index.js",
     "hot-reload": "nodemon index.js"
   },
@@ -22,6 +22,7 @@
   "dependencies": {
     "discord.js": "^12.5.3",
     "ffmpeg-static": "^4.4.0",
+    "google-tts-api": "^2.0.2",
     "js-video-url-parser": "^0.4.3",
     "nodemon": "^2.0.12",
     "opusscript": "0.0.8",

@@ -1,6 +1,6 @@
-# 🎤 Discord Voice Assistant
+# 🎤 Raju Discord Bot
 
-Discord Voice Assistant is a Discord Bot built using [discord.js](https://discord.js.org) and [python speech recognition](https://pypi.org/project/SpeechRecognition) to be a voice activated, multi-purpose discord bot. 
+Raju Discord Bot is a Discord Bot built using [discord.js](https://discord.js.org) and [python speech recognition](https://pypi.org/project/SpeechRecognition) to be a voice activated, multi-purpose discord bot. 
 
 ## ⚠Requirements
 1. [Discord Bot Token](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
@@ -14,11 +14,11 @@ Easily deployable using git clone:
 
 ```bash
 git clone https://github.com/quentinmay/discord-voice-assistant.git
-cd discord-voice-assistant
+cd raju-voice-assistant
 npm install
 pip install SpeechRecognition
 
-mkdir voicedata
+npm run setup
 ```
 Now you must configure the bot before running using config example file:
 ```bash
@@ -44,4 +44,9 @@ Only the top 2 are required for basic functionality.
 Just startup the script now that everything has been built and you've filled your config file.
 ```bash
 node index.js
+```
+
+For Dev Purpose (Hot Reload)
+```bash
+npm run hot-reload
 ```

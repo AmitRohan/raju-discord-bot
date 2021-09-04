@@ -1,12 +1,10 @@
 # 🎤 Raju Discord Bot
 
-Raju Discord Bot is a Discord Bot built using [discord.js](https://discord.js.org) and [python speech recognition](https://pypi.org/project/SpeechRecognition) to be a voice activated, multi-purpose discord bot. 
+Raju Discord Bot is a Discord Bot built using [discord.js](https://discord.js.org) to be a multi-purpose discord bot. 
 
 ## ⚠Requirements
 1. [Discord Bot Token](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
 2. [Node.js 14.0.0 or newer](https://nodejs.org/)
-3. [Python 2.7.18](https://docs.python.org/release/2.7.18/)
-4. [Python Speech Recognition](https://pypi.org/project/SpeechRecognition)
 
 ## ⚡Installation
 
@@ -15,9 +13,6 @@ Easily deployable using git clone:
 ```bash
 git clone https://github.com/quentinmay/discord-voice-assistant.git
 cd raju-voice-assistant
-npm install
-pip install SpeechRecognition
-
 npm run setup
 ```
 Now you must configure the bot before running using config example file:
@@ -34,9 +29,6 @@ Only the top 2 are required for basic functionality.
     "commandPrefix": "0",
     "spotifyClientID": "",
     "spotifyClientSecret": "",
-    "statusActivity": "status.",
-    "statusURL": "https://www.twitch.tv/twitch",
-    "statusType": "STREAMING"
 }
 ```
 

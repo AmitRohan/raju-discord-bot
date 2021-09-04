@@ -1,8 +1,5 @@
 const fs = require('fs');
-const path = require('path');
 const Discord = require('discord.js');
-var FileWriter = require('wav').FileWriter;
-var replaceExt = require('replace-ext');
 
 const ytsr = require('ytsr');
 const ytdl = require('ytdl-core');
@@ -28,7 +25,6 @@ var spotifyApi;
 var musicStream;
 var pause = false;
 
-var python = "python";
 
 var queue = [];
 var dispatcher;
@@ -142,8 +138,8 @@ function deleteOldAudio() {
 Sets discord bot user activity. (My sample uses STREAMING so his icon is purple.)
 */
 function setStatus() {
-    client.user.setActivity(config.statusActivity, {
-        type: "Listening to "+ config.commandPrefix,
+    client.user.setActivity("status.", {
+        type: "Listening to " + config.commandPrefix,
         url: "https://github.com/AmitRohan/raju-discord-bot"
     }).catch(console.error);
 }
@@ -337,10 +333,6 @@ client.on('message', (msg) => {
                 break;
             case 'shuffle':
                 song_shuffle(msg.channel);
-                break;
-            case 'follow':
-                textChannel = msg.channel;
-                follow(msg.member);
                 break;
             case 'on':
             case 'join':
@@ -1252,253 +1244,6 @@ function start(member) {
 
         voiceConnections.set(activeChannelId, activeVoiceConnection);
     }).catch(console.error);
-}
-
-
-
-function follow(member) {
-    console.log(`Following ${member.user.username}`)
-    if (!member || !member.voice.channel) {
-        console.log("Error: voice channel doesnt exists");
-        //console.log('yes')
-        //return;
-    }
-
-    member.voice.channel.join().then((voiceConnection) => {
-        try {
-            following = member;
-
-            dispatcher = voiceConnection.play("./silence.mp3", {
-                volume: '.001'
-            });
-
-            console.log("Recording...");
-
-            voiceConnections.set(member.voice.channelID, voiceConnection);
-            let voiceReceiver = voiceConnection.receiver;
-            voiceConnection.on('speaking', (user, speaking) => {
-                try {
-
-                    if (speaking) {
-
-                        var initialTime = Date.now();
-                        const audioStream = voiceReceiver.createStream(user, {
-                            mode: 'pcm'
-                        });
-                        var time = Date.now();
-                        const filename = `./voicedata/${time}-${user.id}.pcm`;
-                        const outputStream = generateOutputFile(member.voice.channel, user, time);
-                        audioStream.pipe(outputStream);
-                        outputStream.on("data", console.log);
-
-                        audioStream.on('end', () => {
-
-                            try {
-                                const fileSizeInBytes = fs.statSync(filename).size;
-
-
-
-                                if (fileSizeInBytes < 30000) return;
-
-
-                                var wavPath = replaceExt(filename, '.wav');
-
-                                const input = fs.createReadStream(filename);
-
-                                var output = new FileWriter(wavPath, {
-                                    sampleRate: 48000,
-                                    channels: 2
-                                });
-
-                                input.pipe(output);
-
-                                output.on("end", () => {
-
-                                    var spawn = require('child_process').spawn,
-                                        py = spawn(python, ['transcribe.py']),
-                                        data = path.basename(wavPath),
-                                        dataString = '';
-
-                                    py.stdout.on('data', function (data) {
-                                        dataString += data.toString();
-
-                                    });
-                                    py.stdout.on('end', function () {
-                                        //console.log(dataString);
-
-                                        dataString = dataString.trim().toLowerCase();
-                                        if (dataString.length == 0) return;
-                                        var timenow = Date.now();
-                                        voiceRecognitionTotalTime += (timenow - initialTime);
-                                        voiceRecognitionInstances++;
-                                        console.log(`${dataString.toString()} ${user.username} ` + (timenow - initialTime) + `ms.`);
-
-
-                                        if (dataString.split(" ").length >= 2) {
-                                            if (dataString.split(" ")[0].indexOf("sean") != -1) //fix songs to song
-                                                dataString = dataString.replace("sean", "song");
-                                            if (dataString.split(" ")[0].indexOf("songs") != -1) //fix songs to song
-                                                dataString = dataString.replace("songs", "song");
-                                            if (dataString.split(" ")[0].indexOf("sonic") != -1) //fix songs to song
-                                                dataString = dataString.replace("sonic", "song");
-                                            if (dataString.split(" ")[0].indexOf("tsongas") != -1) //fix songs to song
-                                                dataString = dataString.replace("tsongas", "song");
-                                            if (dataString.split(" ")[0].indexOf("sun") != -1) //fix songs to song
-                                                dataString = dataString.replace("sun", "song");
-                                            if (dataString.split(" ")[0].indexOf("saint") != -1) //fix songs to song
-                                                dataString = dataString.replace("saint", "song");
-                                            if (dataString.split(' ')[0].indexOf("song-") != -1) {
-                                                var tmp = dataString.split(' ').shift();
-                                                dataString = tmp.unshift(dataString.split(' ')[0].replace("song-", "song ")).join(" ");
-                                            }
-                                            if (dataString.split(" ")[0] == "song") {
-                                                var tmp = dataString.split(" ");
-                                                tmp.shift();
-                                                dataString = tmp.join(" ");
-                                                getGuildMemberFromServerIDAndUserID(member.guild.id, user.id).then(author => {
-                                                    voiceCommandHandler(author, dataString);
-                                                });
-                                            }
-                                        }
-
-
-                                    });
-                                    py.stdin.write(JSON.stringify(data));
-                                    py.stdin.end();
-
-                                })
-
-
-
-                            } catch (err) {
-                                //console.log(err);
-                            }
-                        });
-
-                    }
-                } catch (err) {
-                    console.log(err);
-                    if (err.message.indexOf("Couldn't resolve the user") != -1) {
-                        voiceReceiver = voiceConnection.receiver;
-                    }
-                    console.log("Error: Error in converting file")
-                }
-            });
-        } catch (err) {
-            console.log(err);
-            console.log("Error: Error in 1")
-        }
-
-
-    }).catch(err => {
-        console.log(err);
-        console.log("Error: Error in joining channel or listening.")
-    });
-}
-
-/*
-Parses voice transcribed commands that could have a bunch of potential different sounding names. For example, the voice line "skip"
-might be interpreted by the transcription api as "kip". Should still perform the same function so not a big deal.
-*/
-function voiceCommandHandler(author, rawString) {
-    //Trash code tbh. Poorly named variables need to be changed. Mostly was done for lazy quick fix but never fixed.
-    var cmd = rawString.split(' ')[0];
-    var tmp = rawString.split(" ");
-    tmp.shift();
-    var contents = tmp.join(" ");
-    switch (cmd) {
-        case "play":
-        case "by":
-            commandPlay(author, 'playtop', contents, true);
-            break;
-        case "playlist":
-            if (config.spotifyClientID && config.spotifyClientSecret) {
-                if (contents.trim() != '') {
-                    var genre = contents.trim();
-                    getSpotifyList().then(function (genreList) {
-                        console.log(genreList);
-                        var names = [];
-                        for (item of genreList.fields) {
-                            names.push(item.name);
-                        }
-
-                        var matches = stringSimilarity.findBestMatch(genre, names);
-                        if (matches.bestMatch.rating < .7) {
-                            console.log("None close found")
-                        } else {
-                            //console.log(matches.bestMatchIndex + ":" + matches.bestMatch.target);
-                            spotifyGenreList(textChannel, (matches.bestMatchIndex + 1) + " 1", author);
-                        }
-                    });
-                }
-            } else {
-                console.log("spotifyClientID or spotifyClientSecret missing. Will not be able to use spotify functionality.");
-            }
-
-            break;
-        case "pause":
-            song_pause();
-            break;
-        case "stop":
-            break;
-        case "skip":
-        case "destroyer":
-        case "destroy":
-        case "destroys":
-        case "destroyed":
-        case "kip":
-        case "skit":
-            textChannel.send("`Song skipped.`")
-            console.log('Song skipped.');
-            song_skip();
-            break;
-        case "clear":
-        case "cleared":
-        case "clair":
-            textChannel.send("`Queue cleared.`")
-            console.log('Queue cleared.');
-            song_clear();
-            break;
-        case "resume":
-        case "continue":
-        case "unpause":
-            textChannel.send("`Song resumed.`")
-            console.log('Song resumed.');
-            song_resume();
-            break;
-        case "shuffle":
-            console.log('Queue shuffled.');
-            song_shuffle(textChannel);
-            break;
-        case "queue":
-        case "que":
-        case "que":
-            sendQueue(textChannel);
-            break;
-        case "times":
-            textChannel.send(`Average Speech Recognition Timer: ${voiceRecognitionTotalTime / voiceRecognitionInstances}ms.`);
-            break;
-        case "volume":
-            song_volume(textChannel, contents);
-            break;
-
-        default:
-            break;
-    }
-
-
-
-
-    //updateConfig();
-    cmd.split(' ')[0];
-
-
-}
-
-function generateOutputFile(channel, member, time) {
-    // use IDs instead of username cause some people have emojis in their name
-    const fileName = `./voicedata/${time}-${member.id}.pcm`;
-    return fs.createWriteStream(fileName);
 }
 
 function stop(member) {

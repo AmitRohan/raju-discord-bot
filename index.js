@@ -8,6 +8,7 @@ const urlParser = require('js-video-url-parser')
 
 const googleTTS = require('google-tts-api');
 
+const myAnalytics = require('./src/analytics')
 
 var stringSimilarity = require('string-similarity');
 const wordsToNumbers = require('words-to-numbers');
@@ -34,7 +35,6 @@ let voiceConnections = new Map();
 let voiceReceivers = new Map();
 
 let client = new Discord.Client();
-
 let textChannel;
 
 var voiceRecognitionTotalTime = 0;
@@ -57,6 +57,10 @@ var configFile = './config.json';
 
 client.on('ready', () => {
     console.log("Started!");
+    console.log("Initialising Logs");
+    myAnalytics.updateClient(client)
+
+    myAnalytics.logToAnalytics("Hi","I Am here")
     setVolume();
     disconnectChannel();
     setStatus();
@@ -202,8 +206,9 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
 
     console.log(`voiceStateUpdate :`,str);
 
-    if(str !== "")
-    googleTTS
+    if(str !== ""){
+        myAnalytics.logToAnalytics("ACDC",str)
+        googleTTS
         .getAudioBase64(str, {
             lang: 'en',
             slow: false,
@@ -222,9 +227,13 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
             }
         ) // base64 text
         .catch(console.error);
+    }
+   
     
     if(textChannel)
         textChannel.send(str);
+
+    
 
 });
 

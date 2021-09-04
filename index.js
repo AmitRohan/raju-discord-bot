@@ -216,12 +216,12 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
         })
         .then(
             base64data => {
-                fs.writeFileSync('voiceOutput/file.mp3', Buffer.from(base64data.replace('data:audio/mp3; codecs=opus;base64,', ''), 'base64'));
+                fs.writeFileSync('voicedata/fileToPlay.mp3', Buffer.from(base64data.replace('data:audio/mp3; codecs=opus;base64,', ''), 'base64'));
 
 
                 if(voiceChannel)
                     voiceChannel.join().then(connection =>{
-                        dispatcher = connection.play("./voiceOutput/file.mp3");
+                        dispatcher = connection.play("./voicedata/fileToPlay.mp3");
                     }).catch(err => console.log(err));
             }
         ) // base64 text

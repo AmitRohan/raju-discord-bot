@@ -33,6 +33,9 @@ Only the top 2 are required for basic functionality.
 ```
 
 ## 🚀Initial Startup
+
+To Get Logs, create a channel named **raju-analytis**.
+
 Just startup the script now that everything has been built and you've filled your config file.
 ```bash
 node index.js

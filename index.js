@@ -143,8 +143,8 @@ Sets discord bot user activity. (My sample uses STREAMING so his icon is purple.
 */
 function setStatus() {
     client.user.setActivity(config.statusActivity, {
-        type: config.statusType,
-        url: config.statusURL
+        type: "Listening to "+ config.commandPrefix,
+        url: "https://github.com/AmitRohan/raju-discord-bot"
     }).catch(console.error);
 }
 

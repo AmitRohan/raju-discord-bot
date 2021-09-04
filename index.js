@@ -1275,7 +1275,15 @@ at the top as a global variable.
 async function reloadConfig() {
     return new Promise(function (resolve, reject) {
         fs.readFile(configFile, 'utf8', function (err, json) {
-            if (err) reject(false);
+            if (err) {
+                config = {
+                   
+                    "discordToken": process.env.discordToken,
+                    "discordDevID":  process.env.discordDevID,
+                    "commandPrefix" :  process.env.commandPrefix
+                }
+                resolve(true)
+            }
             config = JSON.parse(json);
             resolve(true)
         });

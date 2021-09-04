@@ -23,3 +23,11 @@ const logToAnalytics = (tag,param) => {
 }
 
 module.exports["logToAnalytics"] = logToAnalytics
+
+
+const logDirectly = (body) => {
+    const channel = client.channels.cache.find(channel => channel.name === analyticsChannelName)
+    channel.send(body)
+}
+
+module.exports["logDirectly"] = logDirectly

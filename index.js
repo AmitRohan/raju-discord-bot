@@ -207,7 +207,7 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
     console.log(`voiceStateUpdate :`,str);
 
     if(str !== ""){
-        myAnalytics.logToAnalytics("ACDC",str)
+        myAnalytics.logToAnalytics("Info",str)
         googleTTS
         .getAudioBase64(str, {
             lang: 'en',
@@ -228,12 +228,6 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
         ) // base64 text
         .catch(console.error);
     }
-   
-    
-    if(textChannel)
-        textChannel.send(str);
-
-    
 
 });
 
@@ -274,26 +268,21 @@ client.on('message', (msg) => {
             case 'fix':
                 playMusic();
                 break;
-            case 'times':
-                msg.channel.send(`Average Speech Recognition Timer: ${voiceRecognitionTotalTime / voiceRecognitionInstances}ms.`);
-                break;
-            case 'queue':
+           case 'queue':
                 //console.log(client.voiceConnections);
                 sendQueue(msg.channel);
                 //console.log(queue);
                 break;
             case 'play':
             case 'playtop':
-                console.log("I AM HERE");
                 if (msg.member.voice.channel) {
                     var top = true;
                     if (cmd == 'play') top = false;
                     voiceChannel = msg.member.voice.channel;
                     msg.react('🍊');
-                    console.log('play command ' + cmd)
                     commandPlay(msg.member, cmd, contents, top);
                 } else {
-                    console.log("Authors voice channel doesnt exist");
+                    myAnalytics.logToAnalytics("Error","Authors voice channel doesnt exist")
                 }
 
                 break;
@@ -301,46 +290,42 @@ client.on('message', (msg) => {
             case 'playlist':
                 if (config.spotifyClientID && config.spotifyClientSecret) {
                     if (!msg.member.voice.channel) {
-
-                        msg.channel.send("`Must be in a voice channel to use this command.`");
+                        myAnalytics.logToAnalytics("Error","`Must be in a voice channel to use this command.`")
                     } else {
                         voiceChannel = msg.member.voice.channel;
                         spotifyGenreList(msg.channel, contents, msg.member);
                     }
                 } else {
-                    console.log("spotifyClientID or spotifyClientSecret missing. Will not be able to use spotify functionality.");
+                    myAnalytics.logToAnalytics("Error","`spotifyClientID or spotifyClientSecret missing. Will not be able to use spotify functionality.`")
                 }
                 break;
             case 'volume':
                 if (!isNaN(parseInt(contents.trim().split(' ')[0]))) {
                     song_volume(msg.channel, contents.split(' ')[0]);
                 } else {
-                    msg.channel.send("`Volume: " + volume + "`");
+                    myAnalytics.logToAnalytics("Volume","`" + volume + "`")
                 }
 
                 break;
             case 'skip':
-                msg.channel.send("`Song skipped.`")
-                console.log('Song skipped.');
+                myAnalytics.logToAnalytics("Info","`Song skipped.`")
                 song_skip();
                 break;
 
             case 'pause':
-                msg.channel.send("`Song paused.`")
-                console.log('Song paused.');
+                myAnalytics.logToAnalytics("Info","`Song paused.`")
                 song_pause();
                 break;
             case 'resume':
-                msg.channel.send("`Song resumed.`")
-                console.log('Song resumed.');
+                myAnalytics.logToAnalytics("Info","`Song resumed.`")
                 song_resume();
                 break;
             case 'clear':
-                msg.channel.send("`Song cleared.`")
-                console.log('Queue cleared.');
+                myAnalytics.logToAnalytics("Info","`Song cleared.`")
                 song_clear();
                 break;
             case 'shuffle':
+                myAnalytics.logToAnalytics("Info","`Songs shuffled.`")
                 song_shuffle(msg.channel);
                 break;
             case 'on':
@@ -357,7 +342,7 @@ client.on('message', (msg) => {
                 break;
             case 'crash':
                 if (msg.author.id == config.discordDevID) {
-                    msg.member.send("Crash command sent.");
+                    myAnalytics.logToAnalytics("Error","`Crash command sent.`")
                     process.exit(0);
                 }
             default:
@@ -421,7 +406,7 @@ function spotifyGenreList(channel, content, author) {
             })
                 .then(function (data) {
                     if (content.length == 0) {
-                        channel.send("`Listing all featured genres on spotify.`");
+                        myAnalytics.logToAnalytics("Info","`Listing all featured genres on spotify.`")
                         getSpotifyList().then(function (genreList) {
 
                         });
@@ -465,14 +450,15 @@ function spotifyGenreList(channel, content, author) {
                             });
                             //console.log(genreList);
                             if (genreList.fields.length >= data.body.categories.items.length % 25) { //only sends if it has enough fields to take into account all the playlists
-                                channel.send({
+                                myAnalytics.logToAnalytics("Info","`Listing all featured genres on spotify.`")
+                                myAnalytics.logDirectly({
                                     embed: genreList
-                                });
+                                })
                             } else {
-                                channel.send('`Error sending this embed.`')
-                                channel.send({
+                                myAnalytics.logToAnalytics("Error","`sending this embed.`")
+                                myAnalytics.logDirectly({
                                     embed: genreList
-                                });
+                                })
                             }
 
                         }
@@ -495,7 +481,7 @@ function spotifyGenreList(channel, content, author) {
                         .then(function (data) {
 
                             if (content.length == 1) {
-                                channel.send("`Listing all playlists for " + selectedGenre.name + "`");
+                                myAnalytics.logToAnalytics("Info","`Listing all playlists for " + selectedGenre.name + "``")
                                 //////////////////////////////////////////////////////////////
                                 var embedCount = Math.ceil((data.body.playlists.total / 25));
                                 if (embedCount > 2) embedCount = 2;
@@ -533,15 +519,15 @@ function spotifyGenreList(channel, content, author) {
                                     });
                                     //console.log(genreList);
                                     if (genrePlayListList.fields.length >= data.body.playlists.items.length % 25) { //only sends if it has enough fields to take into account all the playlists
-                                        channel.send({
+                                        myAnalytics.logDirectly({
                                             embed: genrePlayListList
-                                        });
+                                        })
                                     } else {
                                         //console.log(data.body.playlists);
-                                        channel.send('`Error sending this embed.`');
-                                        channel.send({
+                                        myAnalytics.logToAnalytics("Error","`sending this embed.")
+                                        myAnalytics.logDirectly({
                                             embed: genrePlayListList
-                                        });
+                                        })
                                     }
                                 }
                                 ///////////////////////////////////////////////////////////////
@@ -551,8 +537,7 @@ function spotifyGenreList(channel, content, author) {
                                 var playlistSelected = parseInt(content[1]);
                                 if (isNaN(playlistSelected)) return;
                                 playlistSelected--; //To make up for starting at 0
-                                console.log("Playing spotify playlist " + data.body.playlists.items[playlistSelected].id);
-                                channel.send("`Playlist selected " + data.body.playlists.items[playlistSelected].name + "`");
+                                myAnalytics.logToAnalytics("Info","`Playlist selected " + data.body.playlists.items[playlistSelected].name + "`")
                                 spotifyPlaylistOrAlbum(data.body.playlists.items[playlistSelected].id, 'playlist', author)
                             }
 
@@ -656,7 +641,7 @@ function song_volume(channel, vol) {
         }
     }
     if (vol < 0 || vol > 100) return;
-    if (channel) channel.send("`Volume set to " + vol + ".`");
+    myAnalytics.logToAnalytics("Info","`Volume set to " + vol + ".`")
     volume = vol;
     fs.appendFile('./volume.txt', '\n' + vol, (err) => {
         if (err) throw err;
@@ -682,9 +667,9 @@ function song_shuffle(channel) {
         //queue = [queue[0]];
         //queue.concat(shuffle(tmp));
         //console.log(queue);
-        channel.send("`Queue has been shuffled.`")
+        myAnalytics.logToAnalytics("Info","`Queue has been shuffled.`")
     } else {
-        channel.send("`Not enough songs to shuffle.`");
+        myAnalytics.logToAnalytics("Info","`Not enough songs to shuffle.`")
     }
 }
 
@@ -711,7 +696,7 @@ function shuffle(arra1) {
 function sendQueue(channel) {
     try {
         if (queue.length == 0) {
-            channel.send("`There are no songs in queue.`");
+            myAnalytics.logToAnalytics("Info","`There are no songs in queue..`")
             return;
         }
         const exEmb = {
@@ -749,12 +734,12 @@ function sendQueue(channel) {
                 //exampleEmbed.addField(`${i}. [${video.TITLE}](${video.URL})`, '.');
             }
         });
-        channel.send({
+
+        myAnalytics.logDirectly({
             embed: exEmb
         });
     } catch (err) {
-        channel.send("`Error while sending queue.`");
-        console.log(queue);
+        myAnalytics.logToAnalytics("Error","`while sending queue.`")
         console.log(err);
     }
 }
@@ -809,7 +794,8 @@ function botAfkTimer() {
         }
     }
     if (afkTimer >= 5) { //2 minutes 5 instances so 10 minute timer.
-        console.log('Been AFK for 10 minutes. DCing');
+        myAnalytics.logToAnalytics("Info","`Been AFK for 10 minutes. DCing`")
+
         stop(client.voice.connections.first(1)[0].channel.members.first(1)[0]);
 
     }
@@ -838,7 +824,7 @@ function commandPlay(member, cmd, content, top) {
 function errorFindingVideo(err) {
     console.log(err);
     console.log('Error finding video');
-    textChannel.send("`Error: Error finding video.`")
+    myAnalytics.logToAnalytics("Error","`Error finding video.`")
     song_skip();
     // fs.appendFileSync('./console.txt', 'Error finding video' + '\n');
 }
@@ -873,9 +859,8 @@ async function searchYoutube(author, content, top) {
             console.log('going for ' + (urlParser.parse(content)).list);
 
             ytfps((urlParser.parse(content)).list).then(items => {
-
-                textChannel.send('`Adding playlist to queue.`');
-                textChannel.send("`" + items.videos.length + " songs from playlist added to queue.`");
+                myAnalytics.logToAnalytics("Info","`Adding playlist to queue.`")
+                myAnalytics.logToAnalytics("Info","`" + items.videos.length + " songs from playlist added to queue.`")
 
                 items.videos.forEach(item => {
                     if (item.title == 'Private video') {
@@ -1054,7 +1039,8 @@ function add_to_queue(video, top, playlist) {
             .setThumbnail(video.THUMBNAIL)
             .addField('Song Duration', convertTime(video.DURATION), true)
             .addField('Position in queue', position, true);
-        textChannel.send(addedToQueueEmbed);
+        myAnalytics.logDirectly(addedToQueueEmbed)
+        
     }
     if (top == true) {
         if (queue.length > 0) {
@@ -1155,7 +1141,7 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
         seek: 0
     }; //, volume: volume};
     console.log("Streaming",url);
-    textChannel.send("`Playing  "+ url +"`")
+    myAnalytics.logToAnalytics("Info","`Playing  "+ url +"`")
     musicStream = ytdl(url, {
         filter: 'audioonly'
     });

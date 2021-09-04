@@ -9,6 +9,8 @@ const ytdl = require('ytdl-core');
 const ytfps = require('ytfps');
 const urlParser = require('js-video-url-parser')
 
+const googleTTS = require('google-tts-api');
+
 
 var stringSimilarity = require('string-similarity');
 const wordsToNumbers = require('words-to-numbers');
@@ -182,7 +184,53 @@ async function getGuildMemberFromServerIDAndUserID(serverID, id) {
 
 }
 
+client.on("voiceStateUpdate", function(oldMember, newMember){
+    if(!voiceChannel){
+        return;
+    }
+    var userName = newMember.member.user.username;
+    var str = "";
 
+    if(newMember.channelID !== oldMember.channelID){
+        // New Join
+        str = userName + " has joined";
+    }else{
+        if(newMember.mute !== oldMember.mute){
+            str = userName + " has " + (newMember.mute ? "" : "un") + "muted";
+        }
+
+        if(newMember.streaming !== oldMember.streaming){
+            str = userName + " has " + (newMember.streaming ? "started" : "stoped") + " streaming";
+        }
+    }
+
+    console.log(`voiceStateUpdate :`,str);
+
+    if(str !== "")
+    googleTTS
+        .getAudioBase64(str, {
+            lang: 'en',
+            slow: false,
+            host: 'https://translate.google.com',
+            timeout: 10000,
+        })
+        .then(
+            base64data => {
+                fs.writeFileSync('voiceOutput/file.mp3', Buffer.from(base64data.replace('data:audio/mp3; codecs=opus;base64,', ''), 'base64'));
+
+
+                if(voiceChannel)
+                    voiceChannel.join().then(connection =>{
+                        dispatcher = connection.play("./voiceOutput/file.mp3");
+                    }).catch(err => console.log(err));
+            }
+        ) // base64 text
+        .catch(console.error);
+    
+    if(textChannel)
+        textChannel.send(str);
+
+});
 
 
 client.on('message', (msg) => {
@@ -236,6 +284,7 @@ client.on('message', (msg) => {
                     var top = true;
                     if (cmd == 'play') top = false;
                     voiceChannel = msg.member.voice.channel;
+                    msg.react('🍊');
                     console.log('play command ' + cmd)
                     commandPlay(msg.member, cmd, contents, top);
                 } else {
@@ -1180,6 +1229,8 @@ function convertTime(sec) {
     return hours + ':' + min + ':' + sec;
 }
 
+var activeChannelId;
+var activeVoiceConnection;
 
 function start(member) {
 
@@ -1194,7 +1245,12 @@ function start(member) {
         });
 
 
-        voiceConnections.set(member.voice.channelID, voiceConnection);
+        activeChannelId = member.voice.channelID;
+        activeVoiceConnection = voiceConnection;
+
+
+
+        voiceConnections.set(activeChannelId, activeVoiceConnection);
     }).catch(console.error);
 }
 

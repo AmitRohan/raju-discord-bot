@@ -6,8 +6,16 @@ var analyticsChannelName = "raju-analytics";
 
 const updateClient = (_client) => {
     client = _client;
+    channelCleanup();
 }
 module.exports["updateClient"] = updateClient
+
+const channelCleanup = () => {
+    const channel = client.channels.cache.find(channel => channel.name === analyticsChannelName)
+    channel.bulkDelete(50)
+}
+module.exports["channelCleanup"] = channelCleanup
+
 
 const getDecoratedText = (title,body) => {
     return new Discord.MessageEmbed()

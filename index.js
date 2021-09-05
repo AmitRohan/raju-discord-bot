@@ -37,16 +37,10 @@ let voiceReceivers = new Map();
 let client = new Discord.Client();
 let textChannel;
 
-var voiceRecognitionTotalTime = 0;
-var voiceRecognitionInstances = 0;
-
 var repeat = false;
 var volume = 100;
 
 var afkTimer = 0;
-
-var following = null;
-
 
 var configFile = './config.json';
 
@@ -61,7 +55,7 @@ client.on('ready', () => {
     myAnalytics.updateClient(client)
 
     myAnalytics.logToAnalytics("Hi","I Am here")
-    setVolume();
+    song_volume(null, 100)
     disconnectChannel();
     setStatus();
     setInterval(deleteOldAudio, 20000); //
@@ -69,51 +63,6 @@ client.on('ready', () => {
     return;
 
 });
-
-
-/*
-Still not functional and bad naming scheme. Should be hibernationFile, and its basically an
-auto save feature so if the bot crashes, it has necessary data to reboot and go back to doing
-what it was doing before.
-*/
-function updateConfig() {
-    if (following != null) {
-        var config = {
-            displayName: following.displayName,
-            userID: following.user.id,
-            currentGuildID: following.guild.id,
-            paused: pause,
-            queue: queue
-        }
-    } else {
-        var config = {
-            displayName: null,
-            userID: null,
-            currentGuildID: null,
-            paused: pause,
-            queue: queue
-        }
-        let data = JSON.stringify(config);
-        fs.writeFileSync('./configSecond.json', data);
-    }
-}
-
-
-
-/*
-Reads from volume file to have a history of previously used volumes
-*/
-async function setVolume() {
-    try {
-        var data = fs.readFile('./volume.txt', 'utf8');
-        var lines = data.split('\n');
-        volume = lines[lines.length - 1];
-    } catch (err) {
-        //If there was an error reading the volume file, set a new volume that will populate the volume file on its own.
-        song_volume(null, 100)
-        //volume = 100;
-    }
-}
 
 /*
 Removes old temp data of recordings that aren't necessary anymore. Default time till it gets deleted is 60s.
@@ -164,25 +113,6 @@ function disconnectChannel() {
     }
 }
 
-
-
-/*
-Searches guild for member the member with this ID. Useful if you only have userID or user object and need guildMember
-*/
-async function getGuildMemberFromServerIDAndUserID(serverID, id) {
-    for (const guild of client.guilds.cache) {
-        if (guild[1].id == serverID) {
-            for (const member of guild[1].members.cache) {
-                if (member[1].id == id) {
-                    return member[1];
-
-                }
-            }
-        }
-    }
-    return;
-
-}
 
 client.on("voiceStateUpdate", function(oldMember, newMember){
     if(!voiceChannel){

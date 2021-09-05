@@ -126,6 +126,7 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
 client.on('message', (msg) => {
     if (msg.content.charAt(0) === config.commandPrefix
             || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase()) {
+        console.log(msg.content);
         textChannel = msg.channel;
 
         var arrString = msg.content.split(' ')
@@ -227,6 +228,8 @@ client.on('message', (msg) => {
             case 'off':
             case 'stop':
             case 'disconnect':
+                disconnectChannel();
+                break;
             case 'reset':
             case 'restart':
                 stop(msg.member);

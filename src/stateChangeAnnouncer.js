@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const googleTTS = require('google-tts-api');
-const myAnalytics = require('./src/analytics')
+const myAnalytics = require('./analytics')
 
 
 
@@ -34,9 +34,9 @@ module.exports["handleVoiceStateChanges"] = handleVoiceStateChanges
 
 
 var convertToAudioAndReply = (voiceChannel, dispatcher,  stringToConvert) => {
-    myAnalytics.logToAnalytics("Info",str)
+    myAnalytics.logToAnalytics("Info",stringToConvert)
     googleTTS
-        .getAudioBase64(str, {
+        .getAudioBase64(stringToConvert, {
             lang: 'en',
             slow: false,
             host: 'https://translate.google.com',

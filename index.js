@@ -6,9 +6,10 @@ const ytdl = require('ytdl-core');
 const ytfps = require('ytfps');
 const urlParser = require('js-video-url-parser')
 
-const googleTTS = require('google-tts-api');
+
 
 const myAnalytics = require('./src/analytics')
+const stateChangeAnnouncer = require('./src/stateChangeAnnouncer')
 
 var stringSimilarity = require('string-similarity');
 const wordsToNumbers = require('words-to-numbers');
@@ -118,47 +119,7 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
     if(!voiceChannel){
         return;
     }
-    var userName = newMember.member.user.username;
-    var str = "";
-
-    if(newMember.channelID !== oldMember.channelID){
-        // New Join
-        str = userName + " has joined";
-    }else{
-        if(newMember.mute !== oldMember.mute){
-            str = userName + " has " + (newMember.mute ? "" : "un") + "muted";
-        }
-
-        if(newMember.streaming !== oldMember.streaming){
-            str = userName + " has " + (newMember.streaming ? "started" : "stoped") + " streaming";
-        }
-    }
-
-    console.log(`voiceStateUpdate :`,str);
-
-    if(str !== ""){
-        myAnalytics.logToAnalytics("Info",str)
-        googleTTS
-        .getAudioBase64(str, {
-            lang: 'en',
-            slow: false,
-            host: 'https://translate.google.com',
-            timeout: 10000,
-        })
-        .then(
-            base64data => {
-                fs.writeFileSync('voicedata/fileToPlay.mp3', Buffer.from(base64data.replace('data:audio/mp3; codecs=opus;base64,', ''), 'base64'));
-
-
-                if(voiceChannel)
-                    voiceChannel.join().then(connection =>{
-                        dispatcher = connection.play("./voicedata/fileToPlay.mp3");
-                    }).catch(err => console.log(err));
-            }
-        ) // base64 text
-        .catch(console.error);
-    }
-
+    stateChangeAnnouncer.handleVoiceStateChanges(voiceChannel,dispatcher,oldMember,newMember)
 });
 
 

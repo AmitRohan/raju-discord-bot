@@ -120,6 +120,7 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
 
 
 client.on('message', (msg) => {
+    voiceChannel = msg.member.voice.channel;
     musicPlayer.onTextMessageUpdate(msg)
 });
 

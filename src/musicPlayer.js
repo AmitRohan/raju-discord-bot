@@ -74,6 +74,7 @@ module.exports["initializeSpotifyAPI"] = initializeSpotifyAPI
 
 
 const onTextMessageUpdate = (msg) => {
+
     if (msg.content.charAt(0) === config.commandPrefix
             || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase()) {
         console.log(msg.content);
@@ -982,8 +983,7 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
         });
         */
         dispatcher.on('speaking', (speaking) => { //when finished speaking, play next song because that means songs over
-            console.log("Audio Stopped");
-            textChannel
+           
             if (pause == true) return;
             if (speaking == 1) return; //still speaking
             // console.log(speaking);

@@ -17,7 +17,7 @@ var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) 
       userName = "chad"
 
     if(userName.toLowerCase() == "razkro")
-        userName = "Sb ldkiyo ka bhai Razkro"
+        userName = "The Meeting Guy"
     if(userName.toLowerCase() == "jay rangi")
         userName = "Big Daddy Jay"
     if(userName.toLowerCase() == "galaxo09")

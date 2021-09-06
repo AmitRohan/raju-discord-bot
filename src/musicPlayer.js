@@ -37,6 +37,8 @@ var volume = 100;
 var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyUri = require('spotify-uri');
 
+var songRequestChannelName = "chad-song-requests";
+
 
 const updateClient = (_client) => {
     client = _client;
@@ -74,15 +76,19 @@ module.exports["initializeSpotifyAPI"] = initializeSpotifyAPI
 
 
 const onTextMessageUpdate = (msg) => {
-
-    if (msg.content.charAt(0) === config.commandPrefix
-            || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase()) {
+    console.log(msg.channel.name)
+    if (
+      msg.content !== undefined &&
+        (msg.channel.name = songRequestChannelName
+            || msg.content.charAt(0) === config.commandPrefix
+            || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase())) {
         console.log(msg.content);
         textChannel = msg.channel;
 
         var arrString = msg.content.split(' ')
         //remove our commandPrefix using shift
-        arrString.shift()
+        if(msg.channel.name !== songRequestChannelName)
+          arrString.shift()
 
         var cmd = arrString[0];
         //remove our command using shift

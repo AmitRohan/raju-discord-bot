@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 
 var client;
 
-var analyticsChannelName = "raju-analytics";
+var analyticsChannelName = "chad-analytics";
 
 const updateClient = (_client) => {
     client = _client;

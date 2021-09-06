@@ -137,7 +137,10 @@ async function reloadConfig() {
                        
                         "discordToken": process.env.discordToken,
                         "discordDevID":  process.env.discordDevID,
-                        "commandPrefix" :  process.env.commandPrefix
+                        "commandPrefix" :  process.env.commandPrefix,
+                        "spotifyClientID" :  process.env.spotifyClientID,
+                        "spotifyClientSecret" :  process.env.spotifyClientSecret
+
                     }
                     resolve(true)
                 }
@@ -148,7 +151,9 @@ async function reloadConfig() {
                         
                         "discordToken": process.env.discordToken,
                         "discordDevID":  process.env.discordDevID,
-                        "commandPrefix" :  process.env.commandPrefix
+                        "commandPrefix" :  process.env.commandPrefix,
+                        "spotifyClientID" :  process.env.spotifyClientID,
+                        "spotifyClientSecret" :  process.env.spotifyClientSecret
                     }
                 }
                 resolve(true)
@@ -156,7 +161,6 @@ async function reloadConfig() {
        
     });
 }
-
 
 /*
 Initial boot sequence to make sure that we properly load our config file first and boot in order to avoid crashes.

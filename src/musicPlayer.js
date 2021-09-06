@@ -32,16 +32,22 @@ let textChannel;
 var repeat = false;
 var volume = 100;
 
+const playerState = {
+    currentSongName : "",
+    currentSongThumbnail : "",
+}
 
 
 var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyUri = require('spotify-uri');
 
 var songRequestChannelName = "chad-song-requests";
-
+var playerChannel;
 
 const updateClient = (_client) => {
     client = _client;
+    playerChannel = client.channels.cache.find(channel => channel.name === songRequestChannelName)
+    playerChannel.bulkDelete(100)
 }
 module.exports["updateClient"] = updateClient
 
@@ -49,6 +55,71 @@ const updateConfig = (_config) => {
     config = _config;
 }
 module.exports["updateConfig"] = updateConfig
+
+const updateNowPlaying = (video) => {
+    const addedToQueueEmbed = new Discord.MessageEmbed()
+            .setColor('#9b59b6')
+            .setTitle(video.TITLE)
+            .setURL(video.URL)
+            .setAuthor('Now Playing', '', '')
+            .setThumbnail(video.THUMBNAIL)
+            .addField('Song Duration', convertTime(video.DURATION), true)
+            .addField('Songs Left', queue.length , true);
+
+    playerChannel.bulkDelete(100)
+
+    const reactionAllowd = ['⏯️','⏩','🔀'];
+    
+
+    playerChannel
+        .send(addedToQueueEmbed)
+        .then(msg => {
+            const filter = (reaction) => {
+                return reactionAllowd.includes(reaction.emoji.name);
+            };
+            msg.react('⏯️')
+                .then(() => 
+                msg
+                    .react('⏩')
+                        .then(() => 
+                        msg.react('🔀')
+                                .then(() => 
+                                    msg
+                                        .awaitReactions(filter,{ max: 1, time: 60000 })
+                                        .then(collected => {
+                                            const reaction = collected.first();
+                        
+                                            switch(reaction.emoji.name){
+                                                case "⏯️" : 
+                                                    if(pause){
+                                                        song_resume();
+                                                    }else{
+                                                        song_pause();
+                                                    }
+                                                    break;
+                                                case "⏩" : 
+                                                        song_skip();
+                                                        break;
+                                                case "🔀" : 
+                                                    song_shuffle(msg.channel);
+                                                    break;
+                                            }
+                                        
+                                        })
+                                        .catch(collected => {
+                                            message.reply('You reacted with neither a thumbs up, nor a thumbs down.');
+                                        })
+                                
+                                )
+                        )
+                    );
+
+           
+            
+        })
+    ;
+}
+
 
 /*
 Initializes spotify API using given spotifyClient auth in config file. If nothing is given, the key functionality for the bot will still work
@@ -622,6 +693,7 @@ function song_skip() {
     if (dispatcher) {
 
         dispatcher.end();
+        queue.shift()
         playMusic();
         //dispatcher.end();
     }
@@ -950,6 +1022,7 @@ async function playMusic() {
         }
     } else {
         createStream(queue[0].URL)
+        updateNowPlaying(queue[0])
     }
     //check to see if dispatcher voice connection exists if not, make new one
     //if (!seek) seek = 0;

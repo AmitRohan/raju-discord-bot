@@ -76,10 +76,9 @@ module.exports["initializeSpotifyAPI"] = initializeSpotifyAPI
 
 
 const onTextMessageUpdate = (msg) => {
-    console.log(msg.channel.name)
     if (
       msg.content !== undefined &&
-        (msg.channel.name = songRequestChannelName
+        (msg.channel.name === songRequestChannelName
             || msg.content.charAt(0) === config.commandPrefix
             || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase())) {
         console.log(msg.content);

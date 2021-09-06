@@ -34,7 +34,7 @@ var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) 
 
     if(newMember.channelID !== oldMember.channelID){
         // New Join
-        str = userName + " has joined";
+        str = userName + (newMember.channelID == undefined ? "has left" : "has joined");
     }else{
         if(newMember.mute !== oldMember.mute){
             str = userName + " has " + (newMember.mute ? "" : "un") + "muted";

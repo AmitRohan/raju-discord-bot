@@ -14,6 +14,15 @@ var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) 
     var str = "";
     if(newMember.channelID !== oldMember.channelID){
         // New Join
+        if(userName.toLowerCase() == "raju")
+            userName = "chad"
+
+        if(userName.toLowerCase() == "razkro")
+            userName = "sbka baap razkro"
+        if(userName.toLowerCase() == "jay rangi")
+            userName = "chota jay badi baat"
+       
+
         str = userName + " has joined";
     }else{
         if(newMember.mute !== oldMember.mute){

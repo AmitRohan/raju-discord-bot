@@ -28,7 +28,7 @@ var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) 
         userName = "Cinifillia"
     if(userName.toLowerCase() == "moonlight")
         userName = "Mr Rohan"
-    if(userName.toLowerCase() == "kirito")
+    if(userName.toLowerCase() == "kirito" || userName.toLowerCase() == "kiritop")
         userName = "Hentai with senpai"
 
 

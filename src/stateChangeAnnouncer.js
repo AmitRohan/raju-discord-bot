@@ -12,17 +12,28 @@ var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) 
     counter++;
     var userName = newMember.member.user.username;
     var str = "";
+
+    if(userName.toLowerCase() == "raju")
+      userName = "chad"
+
+    if(userName.toLowerCase() == "razkro")
+        userName = "Sb ldkiyo ka bhai Razkro"
+    if(userName.toLowerCase() == "jay rangi")
+        userName = "Big Daddy Jay"
+    if(userName.toLowerCase() == "galaxo09")
+        userName = "Navy Boy"
+    if(userName.toLowerCase() == "aditya khoriwal")
+        userName = "Sbse galat launda"
+    if(userName.toLowerCase() == "rapmech")
+        userName = "Cinifillia"
+    if(userName.toLowerCase() == "moonlight")
+        userName = "Mr Rohan"
+    if(userName.toLowerCase() == "kirito")
+        userName = "Hentai with senpai"
+
+
     if(newMember.channelID !== oldMember.channelID){
         // New Join
-        if(userName.toLowerCase() == "raju")
-            userName = "chad"
-
-        if(userName.toLowerCase() == "razkro")
-            userName = "sbka baap razkro"
-        if(userName.toLowerCase() == "jay rangi")
-            userName = "chota jay badi baat"
-       
-
         str = userName + " has joined";
     }else{
         if(newMember.mute !== oldMember.mute){

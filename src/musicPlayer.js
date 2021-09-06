@@ -1017,6 +1017,8 @@ async function playMusic() {
 
             queue[0] = chosenVideo;
             createStream(queue[0].URL)
+            updateNowPlaying(queue[0])
+
         } catch (err) {
             errorFindingVideo(err)
         }

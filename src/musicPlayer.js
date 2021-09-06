@@ -1087,3 +1087,18 @@ function stop(member) {
 }
 
 
+function disconnectChannel() {
+    for (const channel of client.channels.cache) {
+        if (channel[1].type == "voice") {
+            for (const member of channel[1].members) {
+                if (member[0] == client.user.id) {
+                    member[1].voice.channel.join().then(connection => {
+                        member[1].voice.channel.leave();
+                    });
+
+                    console.log('Disconnect from channel')
+                }
+            }
+        }
+    }
+}

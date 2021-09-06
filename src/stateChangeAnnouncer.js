@@ -4,14 +4,14 @@ const googleTTS = require('google-tts-api');
 const myAnalytics = require('./analytics')
 
 
-
+var counter = 0;
 var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) => {
     if(!voiceChannel){
         return;
     }
+    counter++;
     var userName = newMember.member.user.username;
     var str = "";
-
     if(newMember.channelID !== oldMember.channelID){
         // New Join
         str = userName + " has joined";
@@ -34,7 +34,6 @@ module.exports["handleVoiceStateChanges"] = handleVoiceStateChanges
 
 
 var convertToAudioAndReply = (voiceChannel, dispatcher,  stringToConvert) => {
-    myAnalytics.logToAnalytics("Info",stringToConvert)
     googleTTS
         .getAudioBase64(stringToConvert, {
             lang: 'en',

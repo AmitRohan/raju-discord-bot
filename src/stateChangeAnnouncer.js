@@ -34,14 +34,14 @@ var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) 
 
     if(newMember.channelID !== oldMember.channelID){
         // New Join
-        str = userName + (newMember.channelID == undefined ? "has left" : "has joined");
+        str = userName + (newMember.channelID == undefined ? " has left" : " has joined");
     }else{
         if(newMember.mute !== oldMember.mute){
             str = userName + " has " + (newMember.mute ? "" : "un") + "muted";
         }
 
         if(newMember.streaming !== oldMember.streaming){
-            str = userName + " has " + (newMember.streaming ? "started" : "stoped") + " streaming";
+            str = userName + " has " + (newMember.streaming ? "started" : "stopped") + " streaming";
         }
     }
 
@@ -56,7 +56,7 @@ module.exports["handleVoiceStateChanges"] = handleVoiceStateChanges
 var convertToAudioAndReply = (voiceChannel, dispatcher,  stringToConvert) => {
     googleTTS
         .getAudioBase64(stringToConvert, {
-            lang: 'en',
+            lang: 'en-AU',
             slow: false,
             host: 'https://translate.google.com',
             timeout: 10000,

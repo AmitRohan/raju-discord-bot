@@ -56,7 +56,7 @@ module.exports["handleVoiceStateChanges"] = handleVoiceStateChanges
 var convertToAudioAndReply = (voiceChannel, dispatcher,  stringToConvert) => {
     googleTTS
         .getAudioBase64(stringToConvert, {
-            lang: 'en-AU',
+            lang: 'hi-IN',
             slow: false,
             host: 'https://translate.google.com',
             timeout: 10000,

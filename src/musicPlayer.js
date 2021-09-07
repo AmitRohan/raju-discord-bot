@@ -107,7 +107,7 @@ const updateNowPlaying = (video) => {
                                         
                                         })
                                         .catch(collected => {
-                                            message.reply('You reacted with neither a thumbs up, nor a thumbs down.');
+                                            msg.reply('You reacted with neither a thumbs up, nor a thumbs down.');
                                         })
                                 
                                 )

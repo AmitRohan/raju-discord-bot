@@ -34,14 +34,32 @@ var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) 
 
     if(newMember.channelID !== oldMember.channelID){
         // New Join
-        str = userName + (newMember.channelID == undefined ? " has left" : " has joined");
+        str = userName + (newMember.channelID == undefined ? " bhag gaya sala" : " padhara hai");
     }else{
         if(newMember.mute !== oldMember.mute){
-            str = userName + " has " + (newMember.mute ? "" : "un") + "muted";
+            if(newMember.mute){
+                // if(userName.toLowerCase() == "jay rangi"){
+                    str = userName +" ne muh may lay liya hai. Kripya nikaalne ka intezaar kare."
+                // }else{
+                //     str = userName +" ne muh may lay liya hai. Kripya nikaalne ka intezaar kare."
+                // }
+            }else{
+                // if(userName.toLowerCase() == "jay rangi"){
+                    str = userName + " ne muh may se nikaal liya, wapis lene ka intezaar kare"
+                // }else{
+                //      str = userName + " ne muh may se nikaal liya, wapis lene ka intezaar kare"
+                // }
+            }
         }
 
         if(newMember.streaming !== oldMember.streaming){
-            str = userName + " has " + (newMember.streaming ? "started" : "stopped") + " streaming";
+            if(newMember.streaming){
+                str = userName + " apna sub ko dikhaa raha hai. Deekhne ka man ho to aa jaaiye.";
+
+            }else{
+                str = userName + " ne apna sub ko dikhana bund kr diya hai.";
+
+            }
         }
     }
 
@@ -56,7 +74,7 @@ module.exports["handleVoiceStateChanges"] = handleVoiceStateChanges
 var convertToAudioAndReply = (voiceChannel, dispatcher,  stringToConvert) => {
     googleTTS
         .getAudioBase64(stringToConvert, {
-            lang: 'hi-IN',
+            lang: 'hi',
             slow: false,
             host: 'https://translate.google.com',
             timeout: 10000,

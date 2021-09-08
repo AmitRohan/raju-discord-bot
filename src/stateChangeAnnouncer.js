@@ -3,27 +3,19 @@ const fs = require('fs');
 const googleTTS = require('google-tts-api');
 const myAnalytics = require('./analytics')
 
-var client;
 
-var announcerChannel = "Chad House";
-
-const updateClient = (_client) => {
-    client = _client;
-    channelCleanup();
-}
-module.exports["updateClient"] = updateClient
-
-const channelCleanup = () => {
-    voiceChannel = client.channels.cache.find(channel => channel.name === announcerChannel)
+const updateChannel = (_voiceChannel) => {
+    voiceChannel = _voiceChannel;
 }
 
+module.exports["updateChannel"] = updateChannel
 
 var handleVoiceStateChanges = (oldMember, newMember) => {
 
     var userName = newMember.member.user.username;
     var str = "";
 
-    var temp = {
+    var speechConfig = {
         nameConfigs : [
             {
                 name : "kiritop",
@@ -50,40 +42,38 @@ var handleVoiceStateChanges = (oldMember, newMember) => {
                 name : "raju",
                 toShow : "chad"
             }
-        ]
+        ],
+        userJoins : " padhara hai.",
+        userLeft : " bhag gaya sala.",
+        userMute : " ne muh may lay liya hai. Kripya nikaalne ka intezaar kare.",
+        userUnmute : " ne muh may se nikaal liya, wapis lene ka intezaar kare.",
+        userStreamStart : " apna sub ko dikhaa raha hai. Deekhne ka man ho to aa jaaiye.",
+        userStreamStop : " ne apna sub ko dikhana bund kr diya hai."
+
     }
 
-    var userNamesToUse = temp.nameConfigs.filter(  nameConfig  => nameConfig.name.toLowerCase() == userName.toLowerCase())
+    var userNamesToUse = speechConfig.nameConfigs.filter(  nameConfig  => nameConfig.name.toLowerCase() == userName.toLowerCase())
     userName = userNamesToUse.length > 0 ? userNamesToUse[0].toShow : userName;
     
 
 
     if(newMember.channelID !== oldMember.channelID){
-        // New Join
-        str = userName + (newMember.channelID == undefined ? " bhag gaya sala" : " padhara hai");
+        str = userName + (newMember.channelID == undefined ? speechConfig.userLeft : speechConfig.userJoins);
     }else{
         if(newMember.mute !== oldMember.mute){
             if(newMember.mute){
-                // if(userName.toLowerCase() == "jay rangi"){
-                    str = userName +" ne muh may lay liya hai. Kripya nikaalne ka intezaar kare."
-                // }else{
-                //     str = userName +" ne muh may lay liya hai. Kripya nikaalne ka intezaar kare."
-                // }
+                str = userName + speechConfig.userMute
             }else{
-                // if(userName.toLowerCase() == "jay rangi"){
-                    str = userName + " ne muh may se nikaal liya, wapis lene ka intezaar kare"
-                // }else{
-                //      str = userName + " ne muh may se nikaal liya, wapis lene ka intezaar kare"
-                // }
+                str = userName +  speechConfig.userUnmute        
             }
         }
 
         if(newMember.streaming !== oldMember.streaming){
             if(newMember.streaming){
-                str = userName + " apna sub ko dikhaa raha hai. Deekhne ka man ho to aa jaaiye.";
+                str = userName + speechConfig.userStreamStart;
 
             }else{
-                str = userName + " ne apna sub ko dikhana bund kr diya hai.";
+                str = userName + speechConfig.userStreamStop;
 
             }
         }

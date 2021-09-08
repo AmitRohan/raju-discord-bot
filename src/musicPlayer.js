@@ -29,7 +29,6 @@ let voiceReceivers = new Map();
 
 var repeat = false;
 var volume = 100;
-var announcerChannel = "Chad House";
 
 
 const playerState = {
@@ -41,22 +40,24 @@ const playerState = {
 var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyUri = require('spotify-uri');
 
-var songRequestChannelName = "chad-song-requests";
 var playerChannel;
 
 const updateClient = (_client) => {
     client = _client;
-    channelCleanup();
    
 }
 module.exports["updateClient"] = updateClient
 
+const updateChannel = (_voiceChannel,_playerChannel) => {
+    voiceChannel = _voiceChannel;
+    playerChannel = _playerChannel
+    channelCleanup();
+}
+
+module.exports["updateChannel"] = updateChannel
 
 const channelCleanup = () => {
-    playerChannel = client.channels.cache.find(channel => channel.name === songRequestChannelName)
     playerChannel.bulkDelete(100)
-
-    voiceChannel = client.channels.cache.find(channel => channel.name === announcerChannel)
 }
 
 
@@ -154,129 +155,104 @@ const initializeSpotifyAPI = async (_config = config) => {
 }
 module.exports["initializeSpotifyAPI"] = initializeSpotifyAPI
 
-
-const onTextMessageUpdate = (msg) => {
-    if (
-      msg.content !== undefined &&
-        (msg.channel.name === songRequestChannelName
-            || msg.content.charAt(0) === config.commandPrefix
-            || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase())) {
-        console.log(msg.content);
-        textChannel = msg.channel;
-
-        var arrString = msg.content.split(' ')
-        //remove our commandPrefix using shift
-        if(msg.channel.name !== songRequestChannelName)
-          arrString.shift()
-
-        var cmd = arrString[0];
-        //remove our command using shift
-        arrString.shift()
-        var contents = arrString.join(" ");
-        
-        
-        console.log("Cmd",cmd,contents);
-
-        switch (cmd) {
-            case 'test':
-                getSpotifyList().then(function (genreList) {
-                    var names = [];
-                    for (item of genreList.fields) {
-                        names.push(item.name);
-                    }
-                    //gaming 13
-                    var matches = stringSimilarity.findBestMatch('gaming', names);
-                    if (matches.bestMatch.rating < .7) {
-                        console.log("None close found")
-                    } else {
-                        console.log(matches.bestMatchIndex + ":" + matches.bestMatch.target);
-                    }
-                });
-                break;
-            case 'fix':
-                playMusic();
-                break;
-           case 'queue':
-                //console.log(client.voiceConnections);
-                sendQueue(msg.channel);
-                //console.log(queue);
-                break;
-            case 'play':
-            case 'playtop':
-                if (msg.member.voice.channel) {
-                    var top = true;
-                    if (cmd == 'play') top = false;
-                    msg.react('🍊');
-                    commandPlay(msg.member, cmd, contents, top);
+const onTextMessageUpdate = (msg,cmd,contents) => {
+    switch (cmd) {
+        case 'test':
+            getSpotifyList().then(function (genreList) {
+                var names = [];
+                for (item of genreList.fields) {
+                    names.push(item.name);
+                }
+                //gaming 13
+                var matches = stringSimilarity.findBestMatch('gaming', names);
+                if (matches.bestMatch.rating < .7) {
+                    console.log("None close found")
                 } else {
-                    myAnalytics.logToAnalytics("Error","Authors voice channel doesnt exist")
+                    console.log(matches.bestMatchIndex + ":" + matches.bestMatch.target);
                 }
+            });
+            break;
+        case 'fix':
+            playMusic();
+            break;
+       case 'queue':
+            //console.log(client.voiceConnections);
+            sendQueue(msg.channel);
+            //console.log(queue);
+            break;
+        case 'play':
+        case 'playtop':
+            if (msg.member.voice.channel) {
+                var top = true;
+                if (cmd == 'play') top = false;
+                msg.react('🍊');
+                commandPlay(msg.member, cmd, contents, top);
+            } else {
+                myAnalytics.logToAnalytics("Error","Authors voice channel doesnt exist")
+            }
 
-                break;
-            case 'spotify':
-            case 'playlist':
-                if (config.spotifyClientID && config.spotifyClientSecret) {
-                    if (!msg.member.voice.channel) {
-                        myAnalytics.logToAnalytics("Error","`Must be in a voice channel to use this command.`")
-                    } else {
-                        spotifyGenreList(msg.channel, contents, msg.member);
-                    }
+            break;
+        case 'spotify':
+        case 'playlist':
+            if (config.spotifyClientID && config.spotifyClientSecret) {
+                if (!msg.member.voice.channel) {
+                    myAnalytics.logToAnalytics("Error","`Must be in a voice channel to use this command.`")
                 } else {
-                    myAnalytics.logToAnalytics("Error","`spotifyClientID or spotifyClientSecret missing. Will not be able to use spotify functionality.`")
+                    spotifyGenreList(msg.channel, contents, msg.member);
                 }
-                break;
-            case 'volume':
-                if (!isNaN(parseInt(contents.trim().split(' ')[0]))) {
-                    song_volume(msg.channel, contents.split(' ')[0]);
-                } else {
-                    myAnalytics.logToAnalytics("Volume","`" + volume + "`")
-                }
+            } else {
+                myAnalytics.logToAnalytics("Error","`spotifyClientID or spotifyClientSecret missing. Will not be able to use spotify functionality.`")
+            }
+            break;
+        case 'volume':
+            if (!isNaN(parseInt(contents.trim().split(' ')[0]))) {
+                song_volume(msg.channel, contents.split(' ')[0]);
+            } else {
+                myAnalytics.logToAnalytics("Volume","`" + volume + "`")
+            }
 
-                break;
-            case 'skip':
-                myAnalytics.logToAnalytics("Info","`Song skipped.`")
-                song_skip();
-                break;
+            break;
+        case 'skip':
+            myAnalytics.logToAnalytics("Info","`Song skipped.`")
+            song_skip();
+            break;
 
-            case 'pause':
-                myAnalytics.logToAnalytics("Info","`Song paused.`")
-                song_pause();
-                break;
-            case 'resume':
-                myAnalytics.logToAnalytics("Info","`Song resumed.`")
-                song_resume();
-                break;
-            case 'clear':
-                myAnalytics.logToAnalytics("Info","`Song cleared.`")
-                song_clear();
-                break;
-            case 'shuffle':
-                myAnalytics.logToAnalytics("Info","`Songs shuffled.`")
-                song_shuffle(msg.channel);
-                break;
-            case 'on':
-            case 'join':
-                textChannel = msg.channel;
-                start(msg.member);
-                break;
-            case 'off':
-            case 'stop':
-            case 'disconnect':
-                disconnectChannel();
-                break;
-            case 'reset':
-            case 'restart':
-                stop(msg.member);
-                break;
-            case 'crash':
-                if (msg.author.id == config.discordDevID) {
-                    myAnalytics.logToAnalytics("Error","`Crash command sent.`")
-                    process.exit(0);
-                }
-            default:
-                break;
-        }
-        //updateConfig();
+        case 'pause':
+            myAnalytics.logToAnalytics("Info","`Song paused.`")
+            song_pause();
+            break;
+        case 'resume':
+            myAnalytics.logToAnalytics("Info","`Song resumed.`")
+            song_resume();
+            break;
+        case 'clear':
+            myAnalytics.logToAnalytics("Info","`Song cleared.`")
+            song_clear();
+            break;
+        case 'shuffle':
+            myAnalytics.logToAnalytics("Info","`Songs shuffled.`")
+            song_shuffle(msg.channel);
+            break;
+        case 'on':
+        case 'join':
+            start(msg.member);
+            break;
+        case 'off':
+        case 'stop':
+        case 'disconnect':
+            disconnectChannel();
+            break;
+        case 'reset':
+        case 'restart':
+            stop(msg.member);
+            break;
+        case 'crash':
+            if (msg.author.id == config.discordDevID) {
+                myAnalytics.logToAnalytics("Error","`Crash command sent.`")
+                process.exit(0);
+            }
+        default:
+            break;
     }
 };
 module.exports["onTextMessageUpdate"] = onTextMessageUpdate
@@ -1127,7 +1103,7 @@ function start(member) {
 
         return;
     }
-    member.voice.channel.join().then((voiceConnection) => {
+    voiceChannel.join().then((voiceConnection) => {
 
         dispatcher = voiceConnection.play("./silence.mp3", {
             volume: '.001'

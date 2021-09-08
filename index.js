@@ -8,6 +8,9 @@ const myAnalytics = require('./src/analytics')
 const stateChangeAnnouncer = require('./src/stateChangeAnnouncer')
 const musicPlayer = require('./src/musicPlayer')
 
+var announcerChannel = "Chad House";
+var songRequestChannelName = "chad-song-requests";
+
 var configFile = './config.json';
 var config;
 
@@ -19,9 +22,11 @@ let client = new Discord.Client();
 client.on('ready', () => {
     console.log("Started!");
     console.log("Initialising Logs");
+    refreshVoiceChannel();
     myAnalytics.updateClient(client)
-    stateChangeAnnouncer.updateClient(client)
+    stateChangeAnnouncer.updateChannel(voiceChannel)
     musicPlayer.updateClient(client)
+    musicPlayer.updateChannel(voiceChannel,playerChannel)
     musicPlayer.updateConfig(config)
 
     myAnalytics.logToAnalytics("Hi","I Am here")
@@ -115,11 +120,39 @@ client.on("voiceStateUpdate", function(oldMember, newMember){
     stateChangeAnnouncer.handleVoiceStateChanges(oldMember,newMember)
 });
 
+const refreshVoiceChannel = () =>{
+    
+    voiceChannel = client.channels.cache.find(channel => channel.name === announcerChannel)
+    
+
+    playerChannel = client.channels.cache.find(channel => channel.name === songRequestChannelName)
+
+}
 
 client.on('message', (msg
     ) => {
-    voiceChannel = msg.member.voice.channel;
-    musicPlayer.onTextMessageUpdate(msg)
+    refreshVoiceChannel();
+
+
+    if (msg.content == undefined)
+        return
+    var arrString = msg.content.split(' ')
+
+    if(msg.channel.name === songRequestChannelName){
+
+    }else if(msg.content.charAt(0) === config.commandPrefix
+                    || msg.content.split(' ')[0].toLocaleLowerCase() === config.commandPrefix.toLocaleLowerCase()){
+        arrString.shift()
+    }else{
+        return;
+    }
+  
+        var cmd = arrString[0];
+        //remove our command using shift
+        arrString.shift()
+        var contents = arrString.join(" ");
+            
+        musicPlayer.onTextMessageUpdate(msg,cmd,contents)
 });
 
 /*

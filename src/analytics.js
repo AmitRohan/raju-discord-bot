@@ -20,8 +20,8 @@ module.exports["channelCleanup"] = channelCleanup
 const getDecoratedText = (title,body) => {
     return new Discord.MessageEmbed()
             .setColor('#ff0066')
-            .setTitle(title)
-            .addField('MSG', body, true)
+            .setTitle(body)
+            .addField('Type', title, true)
 }
 module.exports["getDecoratedText"] = getDecoratedText
 

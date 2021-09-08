@@ -3,13 +3,23 @@ const fs = require('fs');
 const googleTTS = require('google-tts-api');
 const myAnalytics = require('./analytics')
 
+var client;
 
-var counter = 0;
-var handleVoiceStateChanges = (voiceChannel, dispatcher,  oldMember, newMember) => {
-    if(!voiceChannel){
-        return;
-    }
-    counter++;
+var announcerChannel = "Chad House";
+
+const updateClient = (_client) => {
+    client = _client;
+    channelCleanup();
+}
+module.exports["updateClient"] = updateClient
+
+const channelCleanup = () => {
+    voiceChannel = client.channels.cache.find(channel => channel.name === announcerChannel)
+}
+
+
+var handleVoiceStateChanges = (dispatcher,  oldMember, newMember) => {
+
     var userName = newMember.member.user.username;
     var str = "";
 

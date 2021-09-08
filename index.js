@@ -21,6 +21,7 @@ client.on('ready', () => {
     console.log("Started!");
     console.log("Initialising Logs");
     myAnalytics.updateClient(client)
+    stateChangeAnnouncer.updateClient(client)
     musicPlayer.updateClient(client)
     musicPlayer.updateConfig(config)
 
@@ -112,9 +113,6 @@ function disconnectChannel() {
 
 
 client.on("voiceStateUpdate", function(oldMember, newMember){
-    if(!voiceChannel){
-        return;
-    }
     stateChangeAnnouncer.handleVoiceStateChanges(voiceChannel,dispatcher,oldMember,newMember)
 });
 

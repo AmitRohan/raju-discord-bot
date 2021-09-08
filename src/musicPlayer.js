@@ -27,10 +27,12 @@ var voiceChannel;
 let voiceConnections = new Map();
 let voiceReceivers = new Map();
 
-let textChannel;
+let voiceChannel;
 
 var repeat = false;
 var volume = 100;
+var announcerChannel = "Chad House";
+
 
 const playerState = {
     currentSongName : "",
@@ -46,10 +48,19 @@ var playerChannel;
 
 const updateClient = (_client) => {
     client = _client;
-    playerChannel = client.channels.cache.find(channel => channel.name === songRequestChannelName)
-    playerChannel.bulkDelete(100)
+    channelCleanup();
+   
 }
 module.exports["updateClient"] = updateClient
+
+
+const channelCleanup = () => {
+    playerChannel = client.channels.cache.find(channel => channel.name === songRequestChannelName)
+    playerChannel.bulkDelete(100)
+
+    voiceChannel = client.channels.cache.find(channel => channel.name === announcerChannel)
+}
+
 
 const updateConfig = (_config) => {
     config = _config;
@@ -197,7 +208,6 @@ const onTextMessageUpdate = (msg) => {
                 if (msg.member.voice.channel) {
                     var top = true;
                     if (cmd == 'play') top = false;
-                    voiceChannel = msg.member.voice.channel;
                     msg.react('🍊');
                     commandPlay(msg.member, cmd, contents, top);
                 } else {
@@ -211,7 +221,6 @@ const onTextMessageUpdate = (msg) => {
                     if (!msg.member.voice.channel) {
                         myAnalytics.logToAnalytics("Error","`Must be in a voice channel to use this command.`")
                     } else {
-                        voiceChannel = msg.member.voice.channel;
                         spotifyGenreList(msg.channel, contents, msg.member);
                     }
                 } else {
@@ -1040,14 +1049,12 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
     const streamOptions = {
         seek: 0
     }; //, volume: volume};
-    console.log("Streaming",url);
     myAnalytics.logToAnalytics("Info","`Playing  "+ url +"`")
     musicStream = ytdl(url, {
         filter: 'audioonly'
     });
     var connection;
     if (client.voice.connections.size == 1) {
-        console.log("1",url);
         connection = client.voice.connections.first(1)[0];
         if (!connection) return;
         dispatcher = connection.play(musicStream, streamOptions);
@@ -1077,8 +1084,6 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
         });
 
     } else if (voiceChannel) {
-        console.log("2",url);
-
         voiceChannel.join().then((connection) => {
             dispatcher = connection.play(musicStream, streamOptions);
             dispatcher.setVolumeLogarithmic(volume / 100);

@@ -18,7 +18,7 @@ const channelCleanup = () => {
 }
 
 
-var handleVoiceStateChanges = (dispatcher,  oldMember, newMember) => {
+var handleVoiceStateChanges = (oldMember, newMember) => {
 
     var userName = newMember.member.user.username;
     var str = "";
@@ -75,13 +75,13 @@ var handleVoiceStateChanges = (dispatcher,  oldMember, newMember) => {
 
     if(str !== ""){
         myAnalytics.logToAnalytics("Info",str)
-        convertToAudioAndReply(voiceChannel,dispatcher,str)
+        convertToAudioAndReply(voiceChannel,str)
     }
 }
 module.exports["handleVoiceStateChanges"] = handleVoiceStateChanges
 
 
-var convertToAudioAndReply = (voiceChannel, dispatcher,  stringToConvert) => {
+var convertToAudioAndReply = (voiceChannel,  stringToConvert) => {
     googleTTS
         .getAudioBase64(stringToConvert, {
             lang: 'hi',
@@ -96,7 +96,7 @@ var convertToAudioAndReply = (voiceChannel, dispatcher,  stringToConvert) => {
 
                 if(voiceChannel)
                     voiceChannel.join().then(connection =>{
-                        dispatcher = connection.play("./voicedata/fileToPlay.mp3");
+                        connection.play("./voicedata/fileToPlay.mp3");
                     }).catch(err => console.log(err));
             }
         ) // base64 text

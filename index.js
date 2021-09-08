@@ -11,7 +11,6 @@ const musicPlayer = require('./src/musicPlayer')
 var configFile = './config.json';
 var config;
 
-var dispatcher;
 var voiceChannel;
 var afkTimer = 0;
 
@@ -113,7 +112,7 @@ function disconnectChannel() {
 
 
 client.on("voiceStateUpdate", function(oldMember, newMember){
-    stateChangeAnnouncer.handleVoiceStateChanges(dispatcher,oldMember,newMember)
+    stateChangeAnnouncer.handleVoiceStateChanges(oldMember,newMember)
 });
 
 

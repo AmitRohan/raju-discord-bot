@@ -23,23 +23,39 @@ var handleVoiceStateChanges = (oldMember, newMember) => {
     var userName = newMember.member.user.username;
     var str = "";
 
-    if(userName.toLowerCase() == "raju")
-      userName = "chad"
+    var temp = {
+        nameConfigs : [
+            {
+                name : "kiritop",
+                toShow : "Hentai with senpai"
+            },{
+                name : "moonlight",
+                toShow : "Mr Rohan"
+            },{
+                name : "rapmech",
+                toShow : "Cinefillia"
+            },{
+                name : "aditya khoriwal",
+                toShow : "Sbse galat launda"
+            },{
+                name : "galaxo09",
+                toShow : "Navy Boy"
+            },{
+                name : "jay rangi",
+                toShow : "Big Daddy Jay"
+            },{
+                name : "razkro",
+                toShow : "The Meeting Guy"
+            },{
+                name : "raju",
+                toShow : "chad"
+            }
+        ]
+    }
 
-    if(userName.toLowerCase() == "razkro")
-        userName = "The Meeting Guy"
-    if(userName.toLowerCase() == "jay rangi")
-        userName = "Big Daddy Jay"
-    if(userName.toLowerCase() == "galaxo09")
-        userName = "Navy Boy"
-    if(userName.toLowerCase() == "aditya khoriwal")
-        userName = "Sbse galat launda"
-    if(userName.toLowerCase() == "rapmech")
-        userName = "Cinifillia"
-    if(userName.toLowerCase() == "moonlight")
-        userName = "Mr Rohan"
-    if(userName.toLowerCase() == "kirito" || userName.toLowerCase() == "kiritop")
-        userName = "Hentai with senpai"
+    var userNamesToUse = temp.nameConfigs.filter(  nameConfig  => nameConfig.name.toLowerCase() == userName.toLowerCase())
+    userName = userNamesToUse.length > 0 ? userNamesToUse[0].toShow : userName;
+    
 
 
     if(newMember.channelID !== oldMember.channelID){

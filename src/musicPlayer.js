@@ -27,8 +27,6 @@ var voiceChannel;
 let voiceConnections = new Map();
 let voiceReceivers = new Map();
 
-let voiceChannel;
-
 var repeat = false;
 var volume = 100;
 var announcerChannel = "Chad House";

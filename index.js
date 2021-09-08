@@ -113,11 +113,12 @@ function disconnectChannel() {
 
 
 client.on("voiceStateUpdate", function(oldMember, newMember){
-    stateChangeAnnouncer.handleVoiceStateChanges(voiceChannel,dispatcher,oldMember,newMember)
+    stateChangeAnnouncer.handleVoiceStateChanges(dispatcher,oldMember,newMember)
 });
 
 
-client.on('message', (msg) => {
+client.on('message', (msg
+    ) => {
     voiceChannel = msg.member.voice.channel;
     musicPlayer.onTextMessageUpdate(msg)
 });

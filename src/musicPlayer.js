@@ -87,42 +87,37 @@ const updateNowPlaying = (video) => {
             const filter = (reaction) => {
                 return reactionAllowd.includes(reaction.emoji.name);
             };
-            msg.react('⏯️')
-                .then(() => 
+
+            Promise.all[
+                msg.react('⏯️'),
+                msg.react('⏩'),
+                msg.react('🔀'),
                 msg
-                    .react('⏩')
-                        .then(() => 
-                        msg.react('🔀')
-                                .then(() => 
-                                    msg
-                                        .awaitReactions(filter,{ max: 1, time: 60000 })
-                                        .then(collected => {
-                                            const reaction = collected.first();
-                        
-                                            switch(reaction.emoji.name){
-                                                case "⏯️" : 
-                                                    if(pause){
-                                                        song_resume();
-                                                    }else{
-                                                        song_pause();
-                                                    }
-                                                    break;
-                                                case "⏩" : 
-                                                        song_skip();
-                                                        break;
-                                                case "🔀" : 
-                                                    song_shuffle(msg.channel);
-                                                    break;
-                                            }
-                                        
-                                        })
-                                        .catch(collected => {
-                                            msg.reply('You reacted with neither a thumbs up, nor a thumbs down.');
-                                        })
-                                
-                                )
-                        )
-                    );
+                    .awaitReactions(filter,{ max: 1, time: 60000 })
+                    .then(collected => {
+                        const reaction = collected.first();
+    
+                        switch(reaction.emoji.name){
+                            case "⏯️" : 
+                                if(pause){
+                                    song_resume();
+                                }else{
+                                    song_pause();
+                                }
+                                break;
+                            case "⏩" : 
+                                    song_skip();
+                                    break;
+                            case "🔀" : 
+                                song_shuffle(msg.channel);
+                                break;
+                        }
+                    
+                    })
+                    .catch(collected => {
+                        msg.reply('You reacted with neither a thumbs up, nor a thumbs down.');
+                    })
+            ]
 
            
             
@@ -658,6 +653,7 @@ function song_clear() {
 
 function song_resume() {
     if (dispatcher) {
+        myAnalytics.logToAnalytics("Info","`Song resumed.`")
         pause = false;
         dispatcher.resume();
     }
@@ -1027,57 +1023,22 @@ function createStream(url) { //NEEDS FIXING. client.voiceConnections.length is N
     musicStream = ytdl(url, {
         filter: 'audioonly'
     });
-    var connection;
-    if (client.voice.connections.size == 1) {
-        connection = client.voice.connections.first(1)[0];
-        if (!connection) return;
+    voiceChannel.join().then((connection) => {
         dispatcher = connection.play(musicStream, streamOptions);
         dispatcher.setVolumeLogarithmic(volume / 100);
-        pause = false;
-        /*
-        dispatcher.on('end', () => {
-            console.log('dispatcher end 1')
-            if (repeat == false) {
-                queue.shift();
-            }
-            playMusic();
-        });
-        */
+
         dispatcher.on('speaking', (speaking) => { //when finished speaking, play next song because that means songs over
-           
             if (pause == true) return;
             if (speaking == 1) return; //still speaking
-            // console.log(speaking);
-            console.log('dispatcher end 1')
+            console.log('dispatcher end 2')
             if (repeat == false) {
-                // console.log('no repeat so shift queue. 2');
+                console.log('no repeat so shift queue. 3');
 
                 queue.shift();
             }
             playMusic();
         });
-
-    } else if (voiceChannel) {
-        voiceChannel.join().then((connection) => {
-            dispatcher = connection.play(musicStream, streamOptions);
-            dispatcher.setVolumeLogarithmic(volume / 100);
-
-            dispatcher.on('speaking', (speaking) => { //when finished speaking, play next song because that means songs over
-                if (pause == true) return;
-                if (speaking == 1) return; //still speaking
-                console.log('dispatcher end 2')
-                if (repeat == false) {
-                    console.log('no repeat so shift queue. 3');
-
-                    queue.shift();
-                }
-                playMusic();
-            });
-
-
-
-        });
-    }
+    });
 }
 
 //Standard functionality just to convert time in seconds to readable hours:min:seconds
